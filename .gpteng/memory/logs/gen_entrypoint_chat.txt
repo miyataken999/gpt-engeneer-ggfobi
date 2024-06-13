@@ -1,0 +1,324 @@
+
+2024-06-13T09:48:59.447353
+================================ System Message ================================
+
+You will get information about a codebase that is currently on disk in the current folder.
+The user will ask you to write a script that runs the code in a specific way.
+You will answer with code blocks that include all the necessary terminal commands.
+Do not install globally. Do not use sudo.
+Do not explain the code, just give the commands.
+Do not use placeholders, use example values (like . for a folder argument) if necessary.
+
+
+================================ Human Message =================================
+
+
+        Make a unix script that
+        a) installs dependencies
+        b) runs all necessary parts of the codebase (in parallel if necessary)
+        
+Information about the codebase:
+
+```
+File: Structure
+1 web0000001/
+2 requirements.txt
+3 app/
+4 __init__.py
+5 models/
+6 __init__.py
+7 company.py
+8 contact.py
+9 project.py
+10 views/
+11 __init__.py
+12 home.py
+13 about.py
+14 contact.py
+15 projects.py
+16 templates/
+17 base.html
+18 home.html
+19 about.html
+20 contact.html
+21 projects.html
+22 static/
+23 css/
+24 style.css
+25 js/
+26 script.js
+27 images/
+28 logo.png
+29 favicon.ico
+30 __init__.py
+31 app.py
+32 config.py
+33 routes.py
+34 wsgi.py
+
+File: requirements.txt
+1 Flask==2.0.1
+
+File: app/__init__.py
+1 from flask import Flask
+2 from .config import Config
+3 
+4 app = Flask(__name__)
+5 app.config.from_object(Config)
+
+File: app/models/company.py
+1 from dataclasses import dataclass
+2 
+3 @dataclass
+4 class Company:
+5     name: str
+6     description: str
+
+File: app/models/contact.py
+1 from dataclasses import dataclass
+2 
+3 @dataclass
+4 class Contact:
+5     name: str
+6     email: str
+7     message: str
+
+File: app/models/project.py
+1 from dataclasses import dataclass
+2 
+3 @dataclass
+4 class Project:
+5     title: str
+6     description: str
+7     image: str
+
+File: app/views/home.py
+1 from flask import render_template
+2 from .models import Company
+3 
+4 def home():
+5     company = Company(name="Web Development Company", description="We build amazing websites!")
+6     return render_template("home.html", company=company)
+
+File: app/views/about.py
+1 from flask import render_template
+2 
+3 def about():
+4     return render_template("about.html")
+
+File: app/views/contact.py
+1 from flask import render_template, request
+2 from .models import Contact
+3 
+4 def contact():
+5     if request.method == "POST":
+6         name = request.form["name"]
+7         email = request.form["email"]
+8         message = request.form["message"]
+9         contact = Contact(name, email, message)
+10         # Save the contact message to a database or send an email
+11         return "Thank you for contacting us!"
+12     return render_template("contact.html")
+
+File: app/views/projects.py
+1 from flask import render_template
+2 from .models import Project
+3 
+4 def projects():
+5     projects = [
+6         Project("Project 1", "This is project 1", "project1.jpg"),
+7         Project("Project 2", "This is project 2", "project2.jpg"),
+8         Project("Project 3", "This is project 3", "project3.jpg"),
+9     ]
+10     return render_template("projects.html", projects=projects)
+
+File: app/templates/base.html
+1 <!DOCTYPE html>
+2 <html>
+3 <head>
+4     <title>{% block title %}{% endblock %}</title>
+5     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+6 </head>
+7 <body>
+8     <header>
+9         <nav>
+10             <ul>
+11                 <li><a href="{{ url_for('home') }}">Home</a></li>
+12                 <li><a href="{{ url_for('about') }}">About</a></li>
+13                 <li><a href="{{ url_for('contact') }}">Contact</a></li>
+14                 <li><a href="{{ url_for('projects') }}">Projects</a></li>
+15             </ul>
+16         </nav>
+17     </header>
+18     <main>
+19         {% block content %}{% endblock %}
+20     </main>
+21     <footer>
+22         &copy; 2023 Web Development Company
+23     </footer>
+24 </body>
+25 </html>
+
+File: app/templates/home.html
+1 {% extends "base.html" %}
+2 
+3 {% block title %}Home{% endblock %}
+4 
+5 {% block content %}
+6     <h1>Welcome to {{ company.name }}!</h1>
+7     <p>{{ company.description }}</p>
+8 {% endblock %}
+
+File: app/templates/about.html
+1 {% extends "base.html" %}
+2 
+3 {% block title %}About{% endblock %}
+4 
+5 {% block content %}
+6     <h1>About Us</h1>
+7     <p>This is the about page.</p>
+8 {% endblock %}
+
+File: app/templates/contact.html
+1 {% extends "base.html" %}
+2 
+3 {% block title %}Contact{% endblock %}
+4 
+5 {% block content %}
+6     <h1>Contact Us</h1>
+7     <form action="" method="post">
+8         <label for="name">Name:</label>
+9         <input type="text" id="name" name="name"><br><br>
+10         <label for="email">Email:</label>
+11         <input type="email" id="email" name="email"><br><br>
+12         <label for="message">Message:</label>
+13         <textarea id="message" name="message"></textarea><br><br>
+14         <input type="submit" value="Send">
+15     </form>
+16 {% endblock %}
+
+File: app/templates/projects.html
+1 {% extends "base.html" %}
+2 
+3 {% block title %}Projects{% endblock %}
+4 
+5 {% block content %}
+6     <h1>Our Projects</h1>
+7     <ul>
+8     {% for project in projects %}
+9         <li>
+10             <h2>{{ project.title }}</h2>
+11             <p>{{ project.description }}</p>
+12             <img src="{{ url_for('static', filename='images/' + project.image) }}" alt="{{ project.title }}">
+13         </li>
+14     {% endfor %}
+15     </ul>
+16 {% endblock %}
+
+File: app/static/css/style.css
+1 body {
+2     font-family: Arial, sans-serif;
+3 }
+4 
+5 header {
+6     background-color: #333;
+7     color: #fff;
+8     padding: 1em;
+9     text-align: center;
+10 }
+11 
+12 nav ul {
+13     list-style: none;
+14     margin: 0;
+15     padding: 0;
+16     display: flex;
+17     justify-content: space-between;
+18 }
+19 
+20 nav li {
+21     margin-right: 20px;
+22 }
+23 
+24 nav a {
+25     color: #fff;
+26     text-decoration: none;
+27 }
+28 
+29 nav a:hover {
+30     color: #ccc;
+31 }
+32 
+33 main {
+34     display: flex;
+35     flex-direction: column;
+36     align-items: center;
+37     padding: 2em;
+38 }
+39 
+40 footer {
+41     background-color: #333;
+42     color: #fff;
+43     padding: 1em;
+44     text-align: center;
+45     clear: both;
+46 }
+
+File: app/static/js/script.js
+1 // Add JavaScript code here
+
+File: app/app.py
+1 from flask import Flask
+2 from .views import home, about, contact, projects
+3 
+4 app = Flask(__name__)
+5 
+6 @app.route("/")
+7 def index():
+8     return home()
+9 
+10 @app.route("/about")
+11 def about_page():
+12     return about()
+13 
+14 @app.route("/contact", methods=["GET", "POST"])
+15 def contact_page():
+16     return contact()
+17 
+18 @app.route("/projects")
+19 def projects_page():
+20     return projects()
+21 
+22 if __name__ == "__main__":
+23     app.run(debug=True)
+
+File: app/config.py
+1 class Config:
+2     SECRET_KEY = "secret_key_here"
+
+File: app/routes.py
+1 from flask import Blueprint
+2 
+3 bp = Blueprint("main", __name__)
+4 
+5 from . import views
+
+File: app/wsgi.py
+1 from app import app
+2 
+3 if __name__ == "__main__":
+4     app.run()
+
+```
+
+================================== Ai Message ==================================
+
+Here is the Unix script that installs dependencies and runs the codebase:
+```
+#!/bin/bash
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python app/app.py
+```
